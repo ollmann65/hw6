@@ -66,7 +66,7 @@ std::pair<std::set<std::string>, std::set<std::string> > parseDict(std::string f
 	while(dictfs >> word)
 	{
 		dict.insert(word);
-		for(unsigned int i=word.size()-1;i>=1;i--)
+		for(unsigned int i=1;i<word.size();i++)
 		{
 			prefix.insert(word.substr(0,i));
 		}
@@ -96,4 +96,38 @@ bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>
 {
 //add your solution here!
 
+
+    unsigned int n = board.size();
+    // check bounds
+    if(r >= n || c >= n) return false;
+
+    // append current letter
+    word.push_back(board[r][c]);
+
+    // determine if this string is a valid word or prefix
+    bool isWord   = (word.size() >= 2 && dict.find(word) != dict.end());
+    bool isPrefix = (prefix.find(word) != prefix.end());
+
+    // neither word nor prefix: backtrack
+    if(!isWord && !isPrefix) {
+        return false;
+    }
+
+    bool found = false;
+    // first try to extend if still a prefix
+    if(isPrefix) {
+        // if any longer word is found deeper, mark found
+        if(boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc)) {
+            found = true;
+        }
+    }
+
+    // if no longer word found but this is a valid word, record it
+    if(!found && isWord) {
+        result.insert(word);
+        found = true;
+    }
+
+    // return true if any word was recorded in this branch
+    return found;
 }
